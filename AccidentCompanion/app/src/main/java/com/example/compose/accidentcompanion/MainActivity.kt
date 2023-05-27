@@ -8,6 +8,7 @@ import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -17,9 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.compose.accidentcompanion.ui.theme.AccidentCompanionTheme
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.compose.*
 import java.util.*
 
@@ -30,44 +34,73 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Column {
-
-                val context = LocalContext.current
-
-                val text = remember { mutableStateOf("This is a very long input that extends beyond the height of the text area.") }
-                val fire = remember { mutableStateOf(false) }
-                val smoke = remember { mutableStateOf(false) }
-                val carCrash = remember { mutableStateOf(false) }
-                val loc: MutableState<LatLng> = remember { mutableStateOf(LatLng(12.901731999999999,77.517605)) }
-                val cameraPositionState = remember { mutableStateOf(CameraPositionState(position = CameraPosition.fromLatLngZoom(loc.value,10f))) }
-
-                GetMap(context = context, loc, cameraPositionState)
-                TextArea(text)
-                ChipGroup(fire, smoke, carCrash)
-
-                Button(
-                    onClick = { sendToFirebase(text, fire, smoke, carCrash, loc) },
-                    shape = MaterialTheme.shapes.large,
+            AccidentCompanionTheme {
+                Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
-                    Text(
-                        text = "Submit",
+
+                    val context = LocalContext.current
+
+                    val text =
+                        remember { mutableStateOf("This is a very long input that extends beyond the height of the text area.") }
+                    val fire = remember { mutableStateOf(false) }
+                    val smoke = remember { mutableStateOf(false) }
+                    val carCrash = remember { mutableStateOf(false) }
+                    val loc: MutableState<LatLng> =
+                        remember { mutableStateOf(LatLng(12.901731999999999, 77.517605)) }
+                    val cameraPositionState = remember {
+                        mutableStateOf(
+                            CameraPositionState(
+                                position = CameraPosition.fromLatLngZoom(
+                                    loc.value,
+                                    10f
+                                )
+                            )
+                        )
+                    }
+
+                    GetMap(context = context, loc, cameraPositionState)
+                    TextArea(text)
+                    ChipGroup(fire, smoke, carCrash)
+
+                    Button(
+                        onClick = { sendToFirebase(text, fire, smoke, carCrash, loc) },
+                        shape = MaterialTheme.shapes.large,
                         modifier = Modifier
-                            .padding(vertical = 4.dp),
-                        style = MaterialTheme.typography.displayMedium
-                    )
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Submit",
+                            modifier = Modifier
+                                .padding(vertical = 4.dp),
+                            style = MaterialTheme.typography.displayMedium
+                        )
+                    }
                 }
             }
+
 
         }
 
     }
 
-    private fun sendToFirebase(text: MutableState<String>, fire: MutableState<Boolean>, smoke: MutableState<Boolean>, carCrash: MutableState<Boolean>, loc: MutableState<LatLng>) {
-        println(text.value)
-        println(fire.value)
+    private fun sendToFirebase(
+        text: MutableState<String>,
+        fire: MutableState<Boolean>,
+        smoke: MutableState<Boolean>,
+        carCrash: MutableState<Boolean>,
+        loc: MutableState<LatLng>
+    ) {
+        val sensors =
+            "2 ${loc.value.latitude} ${loc.value.longitude} ${if (fire.value) "1" else "0"} ${if (smoke.value) "1" else "0"} ${if (carCrash.value) "1" else "0"}" //latlongfiresmokecar
+        val database = Firebase.database
+        val myRef = database.getReference("disasters/${System.currentTimeMillis()}/sensors")
+        println(System.currentTimeMillis())
+        println(sensors)
+        myRef.setValue(sensors)
     }
 
 
@@ -103,13 +136,17 @@ private fun TextArea(text: MutableState<String>) {
             .clip(MaterialTheme.shapes.medium)
             .fillMaxWidth()
             .height(100.dp),
-        label = { Text("Label") }
+        label = { Text("Enter Your Distress Message") }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChipGroup(fire: MutableState<Boolean>, smoke: MutableState<Boolean>, carCrash: MutableState<Boolean>) {
+private fun ChipGroup(
+    fire: MutableState<Boolean>,
+    smoke: MutableState<Boolean>,
+    carCrash: MutableState<Boolean>
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -120,7 +157,7 @@ private fun ChipGroup(fire: MutableState<Boolean>, smoke: MutableState<Boolean>,
             modifier = Modifier.padding(horizontal = 4.dp),
             selected = !fire.value,
             onClick = { fire.value = !fire.value },
-            label = { Text("Fire") },
+            label = { Text("Fire")},
             leadingIcon = {
                 if (fire.value) {
                     Icon(
@@ -171,7 +208,7 @@ private fun GetMap(
     context: Context,
     loc: MutableState<LatLng>,
     cameraPositionState: MutableState<CameraPositionState>
-){
+) {
     if (cameraPositionState.value.isMoving && cameraPositionState.value.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
         loc.value = cameraPositionState.value.position.target
         println(loc)

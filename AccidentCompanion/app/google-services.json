@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "819172156175",
+    "firebase_url": "https://idkwhatweredoing-default-rtdb.firebaseio.com",
+    "project_id": "idkwhatweredoing",
+    "storage_bucket": "idkwhatweredoing.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819172156175:android:d5237642e067e08b76d47a",
+        "android_client_info": {
+          "package_name": "com.example.compose.accidentcompanion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZxxjqx5kGMV3S-YDN0gTjY9Tr9iNtOUM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
