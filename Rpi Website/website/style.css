@@ -1,0 +1,100 @@
+/**
+ * @license
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/* Set the size of the div element that contains the map */
+body{
+  background-color:#C4DFDF;
+  text-align: center;
+}
+
+h1, h3, p{
+  color:black;
+}
+#Check1
+{
+  padding-bottom: 60px;
+  width: 100px;
+  text-align: left;
+  display: flex;
+  margin: 10px;
+}
+#Check2
+{
+  padding-bottom: 60px;
+  width: 100px;
+  text-align: left;
+  display: flex;
+  margin: 10px;
+}
+#Check3
+{
+  padding-bottom: 60px;
+  width: 100px;
+  text-align: left;
+  display: flex;
+  margin: 10px;
+}
+.submit{
+  margin-top: 20px;
+  size: 3rem;
+}
+#map {
+    height: 450px; /* The height is 400 pixels */
+    width: 80%; /* The width is the width of the web page */
+    /* display: flex; */
+    margin: auto;
+    border-radius: 30px;
+    border: 2px aliceblue solid;
+
+
+}
+
+.requirements{
+  float: left;
+}
+
+.people{
+  float: right;
+}
+
+.people, .requirements{
+  background-color: #322a2a;
+  border: 1px white;
+  border-radius: 5px;
+  margin-right: 8px;
+  padding: 0 20px;
+  margin-bottom: 20px;
+
+
+}
+
+.gm-style-iw-c{
+  padding: 1px !important;
+}
+.gm-style-iw-d{
+  color: aliceblue;
+  background-color: #181616;
+  border-radius: 6px;
+  padding:0 0 0 10px;
+  border: 2px white;
+
+}
+
+.circle{
+  height: 10px;
+  width: 10px;
+  background-color: aliceblue;
+  border-radius: 100px;
+  margin: auto;
+}
+
+.legend{
+  float: right;
+  align-items: center;
+}
+
+p{
+  text-align: left;
+}
