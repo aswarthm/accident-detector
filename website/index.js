@@ -24,7 +24,7 @@ const location = pes
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     mapTypeId: "roadmap",
-    zoom: 17,
+    zoom: 12,
     center: location,
     mapId: "6d77c92efad4c954"
   });
@@ -39,26 +39,24 @@ function initMap() {
 window.initMap = initMap;
 
 
-function addBuoy(buoyData, buoyId){
-  let location = buoyData["location"]
+function addBuoy(buoyData, buoyId, prompt){
+  let sensorData = buoyData["sensors"].split(" ")
+  let location = {lat:parseFloat(sensorData[1]), lng:parseFloat(sensorData[2])}
   console.log(location)
-
+  let colour = "#FF00FF"
+  let svg = `<svg fill="#000000" width="40px" height="40px" viewBox="0 0 24 24" id="danger" data-name="Flat Line" xmlns="http://www.w3.org/2000/svg" class="icon flat-line">
+  <path id="secondary" d="M12.89,3.56l8,16A1,1,0,0,1,20,21H4a1,1,0,0,1-.9-1.45l8-16A1,1,0,0,1,12.89,3.56Z" style="fill: #F79327; stroke-width: 2;"></path>
+  <line id="primary-upstroke" x1="11.95" y1="16.5" x2="12.05" y2="16.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.5;"></line>
+  <path id="primary" d="M12.89,3.56l8,16A1,1,0,0,1,20,21H4a1,1,0,0,1-.9-1.45l8-16A1,1,0,0,1,12.89,3.56ZM12,12V10" style="fill: none; 
+  stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></svg>`
   const svgMarker = {
-    path: `M256,0C114.844,0,0,114.844,0,256s114.844,256,256,256s256-114.844,256-256S397.156,0,256,0z M448,256
-    c0,32.625-8.23,63.344-22.645,90.281l-67.123-44.75C364.461,287.602,368,272.219,368,256c0-16.211-3.539-31.594-9.768-45.523
-    l67.123-44.75C439.77,192.656,448,223.383,448,256z M86.644,346.281C72.23,319.344,64,288.625,64,256
-    c0-32.617,8.23-63.344,22.644-90.273l67.123,44.75C147.539,224.406,144,239.789,144,256c0,16.219,3.539,31.602,9.768,45.531
-    L86.644,346.281z M208,256c0-26.469,21.531-48,48-48c26.469,0,48,21.531,48,48c0,26.469-21.531,48-48,48
-    C229.531,304,208,282.469,208,256z M346.277,86.648l-44.75,67.125C287.6,147.547,272.219,144,256,144
-    c-16.219,0-31.6,3.547-45.527,9.773l-44.75-67.125C192.656,72.234,223.375,64,256,64S319.344,72.234,346.277,86.648z
-     M165.723,425.359l44.75-67.125C224.4,364.469,239.781,368,256,368c16.219,0,31.6-3.531,45.527-9.766l44.75,67.125
-    C319.344,439.773,288.625,448,256,448S192.656,439.773,165.723,425.359z`,
-    fillColor: "#FE6244",
+    url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg),
+    fillColor: "#FC2947",
     fillOpacity: 1.0,
     strokeWeight: 1,
     rotation: 0,
-    scale: 0.07,
-    anchor: new google.maps.Point(0, 20),
+    anchor: new google.maps.Point(15, 15),
+    
   }
 
 const marker = new google.maps.Marker({
@@ -74,7 +72,9 @@ let timeStr = getTimestr(parseInt(buoyId))
 let htmlString = `<div>
 <h3>${dateStr}</h3>
 <h3>${timeStr}</h3>
-<p>${buoyData["prompt"]}</p>
+<div class=prompt>
+<p>${prompt}</p>
+</div>
 </div>`
 makeInfoWindow(marker, htmlString)
 
@@ -83,7 +83,6 @@ makeInfoWindow(marker, htmlString)
 function getDatestr(millis){
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   let dateObj = new Date(millis)
-  console.log(dateObj)
 
   let date = dateObj.getDate() < 10 ?  '0' + dateObj.getDate() : dateObj.getDate()
   let month = months[dateObj.getMonth()]
@@ -119,14 +118,15 @@ function makeInfoWindow(marker, htmlString){
 
 function addMarkers(){
 
-  get(child(dbRef, "/disasters")).then((snapshot) => {
-    console.log(snapshot.val())
-    let data = snapshot.val()
+  get(child(dbRef, "/")).then((snapshot) => {
+    let data = snapshot.val()["disasters"]
     
 
     for (let disasterId in  data){
+      console.log(disasterId)
+      let prompt = snapshot.val()["prompt"][disasterId]
       let disasterData = data[disasterId]
-      addBuoy(disasterData, disasterId)
+      addBuoy(disasterData, disasterId, prompt)
     }
    
   })
